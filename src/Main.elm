@@ -122,7 +122,7 @@ viewCredits =
         []
         ( paragraph
         []
-        [ text "Max Wolf - "
+        [ text "Max Woolf - "
         , el
             [ Font.semiBold
             , Font.underline
@@ -182,8 +182,17 @@ viewForm model =
             , label = Input.labelHidden "Write the first words of the cover letter"
             }
         , el
-            [ alignTop ]
-            ( text "Example" )
+            [ alignTop 
+            , width <| Element.px 200
+            , Font.size 12
+            , Font.family 
+                [ Font.typeface "Merriweather"
+                , Font.serif ]
+            , Font.color (rgba255 0 0 0 0.5)]
+            (paragraph
+                []
+                [( text "e.g. “Dear Hiring Manager, I am applying for the hairdresser position”" )]
+            )
         ]
     , viewButton model
     ]
@@ -209,13 +218,15 @@ viewButton model =
         , label = el [ centerX ] ( text "Write a Cover Letter >" )
         }
 
-fetchLetter : Cmd Msg
-fetchLetter =
+fetchLetter : Model -> Cmd Msg
+fetchLetter model =
     Http.post
-        { url = ""
-        , body = Http.emptyBody
+        { url = "http://34.90.217.41:5000/"
+        , body = Http.multipartBody
+                        [ Http.stringPart "prefix" model.letterText ]
         , expect = Http.expectString GotLetter
         }
+
 
 viewLetter : Model -> Element Msg
 viewLetter model =
@@ -231,14 +242,31 @@ viewLetter model =
             el
             [ height fill
             , width <| fillPortion 1 ]
-            (text "Loading. A human... I'm sorry, a very sophisticated AI, is now writing your letter. This will take a few minutes.")
-
+            (paragraph
+                [ Font.family 
+                    [ Font.typeface "Roboto"
+                    , Font.sansSerif ]
+                , Font.size 14
+                , Background.color (rgb255 244 251 255)
+                , Font.color (rgb255 0 35 61)
+                , padding 20
+                ]
+                [(text "Loading. A human... I'm sorry, a very sophisticated AI is now writing your letter. This will take a few minutes.")]
+            )
         Success newLetter ->
             el
             [ height fill
             , width <| fillPortion 1 ]
-            (text newLetter)
-
+            (paragraph
+                [ Font.family 
+                    [ Font.typeface "Merriweather"
+                    , Font.serif ]
+                , Font.size 14
+                , Background.color (rgb255 248 240 240)
+                , padding 30
+                ]
+                [(text newLetter)]
+            )
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -248,7 +276,7 @@ update msg model =
             ( { model | letterText = newLetterText }, Cmd.none)
 
         GetLetter ->
-            ( model , fetchLetter )
+            ( { model | letter = Loading } , fetchLetter model )
 
         GotLetter result ->
             case result of
