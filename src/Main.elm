@@ -221,7 +221,7 @@ viewButton model =
 fetchLetter : Model -> Cmd Msg
 fetchLetter model =
     Http.post
-        { url = "https://34.90.217.41:5000/"
+        { url = "http://34.90.217.41:5000/"
         , body = Http.multipartBody
                         [ Http.stringPart "prefix" model.letterText ]
         , expect = Http.expectString GotLetter
